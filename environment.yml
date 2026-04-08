@@ -1,0 +1,27 @@
+name: dsci-532_2026_32_Uber_dashboard
+channels:
+  - conda-forge
+dependencies:
+  - python>=3.12
+  - pip
+  - matplotlib
+  - seaborn
+  - ipykernel
+  - ridgeplot
+  - openai
+  - anthropic
+  - ibis-framework
+  - duckdb
+  - pip:
+      - openai==2.24.0
+      - pandas==3.0.1
+      - plotly==6.5.2
+      - shiny==1.5.1
+      - shinychat==0.2.9
+      - shinywidgets==0.7.1
+      - uvicorn==0.41.0
+      - querychat
+      - python-dotenv
+      - chatlas
+      - pytest
+      - pytest-playwright
