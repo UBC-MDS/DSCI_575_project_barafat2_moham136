@@ -8,12 +8,13 @@ dependencies:
   - seaborn
   - ipykernel
   - ridgeplot
-  - openai
-  - anthropic
+  - requests
   - ibis-framework
   - duckdb
   - pip:
       - openai==2.24.0
+      - anthropic
+      -datasets==3.1.0
       - pandas==3.0.1
       - plotly==6.5.2
       - shiny==1.5.1
