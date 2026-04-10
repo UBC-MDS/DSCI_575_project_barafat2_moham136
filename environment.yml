@@ -14,7 +14,7 @@ dependencies:
   - pip:
       - openai==2.24.0
       - anthropic
-      -datasets==3.1.0
+      - datasets==3.1.0
       - pandas==3.0.1
       - plotly==6.5.2
       - shiny==1.5.1
