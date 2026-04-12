@@ -8,10 +8,17 @@ BM25 implementation: rank_bm25 (BM25Okapi)
 ## Query Results and Observations
 
 ### Q1 [KEYWORD]: "argan oil hair spray"
-| Rank | BM25 Result | Semantic Result |
-|------|-------------|-----------------|
-| 1    | ...         | ...             |
-| ...  | ...         | ...             |
+
+- **BM25 Top Result:** 
+Product title:- Nadira Organics Virgin Argan Oil for Skin, Fac...	
+Review:- Love this Argan oil, on my second bottle. Use ...	
+Rating:- 5.0 
+score:- 20.852335
+- **Semantic Search Top Result:**
+Product title:- Cuticle Nippers
+Review:- The cuticle nipper kept getting stuck. It does...
+Rating:- 1.0
+Score:- 0.827
 
 **Observation:** BM25 performs well here because the query contains exact product
 terms. Both methods return relevant results, but BM25 ranks exact matches higher.
