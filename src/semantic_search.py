@@ -30,7 +30,7 @@ def semantic_search(query, top_k=5):
     results = df.iloc[indices[0]].copy()
     results['distance'] = distances[0]
 
-    final = pd.DataFrame(results)[["title","text","distance","rating"]]
+    final = pd.DataFrame(results)[["product_title","text","distance","rating"]]
     final["text"] = results["text"].apply(
     lambda x: x[:200] + "..." if isinstance(x, str) and len(x) > 200 else x
 )

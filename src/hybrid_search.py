@@ -43,14 +43,14 @@ def search_hybrid(query, top_k=3, alpha=0.5):
     
     # Merge results on title (assuming title is unique enough)
     # You might want to use a different key if you have product IDs
-    bm25_results = bm25_results[['title', 'text', 'rating', 'bm25_score']]
-    semantic_results = semantic_results[['title', 'text', 'rating', 'semantic_score']]
+    bm25_results = bm25_results[['product_title', 'text', 'rating', 'bm25_score']]
+    semantic_results = semantic_results[['product_title', 'text', 'rating', 'semantic_score']]
     
     # Outer merge to get all results from both methods
     merged = pd.merge(
         bm25_results, 
         semantic_results, 
-        on=['title', 'text', 'rating'], 
+        on=['product_title', 'text', 'rating'], 
         how='outer'
     )
     
@@ -72,4 +72,4 @@ def search_hybrid(query, top_k=3, alpha=0.5):
 )
     
     # Return with relevant columns
-    return merged[['title', 'text', 'hybrid_score', 'rating']].head(top_k).reset_index(drop=True)
+    return merged[['product_title', 'text', 'hybrid_score', 'rating']].head(top_k).reset_index(drop=True)

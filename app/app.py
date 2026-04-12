@@ -325,7 +325,7 @@ def server(input, output, session):
             
             rows.append(
                 ui.tags.tr(
-                    ui.tags.td(ui.tags.strong(row['title'][:60] + "..." if len(str(row['title'])) > 60 else row['title'])),
+                    ui.tags.td(ui.tags.strong(row['product_title'][:60] + "..." if len(str(row['product_title'])) > 60 else row['product_title'])),
                     ui.tags.td(str(row['text'])[:100] + "..." if len(str(row['text'])) > 100 else row['text']),
                     ui.tags.td(
                         ui.tags.span(

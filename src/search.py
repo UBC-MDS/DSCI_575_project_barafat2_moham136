@@ -48,4 +48,4 @@ def bm25_search(query, top_k=3):
     lambda x: x[:200] + "..." if isinstance(x, str) and len(x) > 200 else x
 )
 
-    return results[["title", "text", "score", "rating"]].reset_index(drop=True)
+    return results[["product_title", "text", "score", "rating"]].reset_index(drop=True)
