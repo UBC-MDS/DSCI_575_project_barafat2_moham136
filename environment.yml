@@ -1,0 +1,32 @@
+name: dsci-575-project
+channels:
+  - conda-forge
+dependencies:
+  - python>=3.12
+  - pip
+  - numpy
+  - ipykernel
+  - ridgeplot
+  - requests
+  - ibis-framework
+  - duckdb
+  - pytorch
+  - pip:
+      - openai==2.24.0
+      - anthropic
+      - datasets==3.1.0
+      - pandas==3.0.1
+      - shiny==1.5.1
+      - shinychat==0.2.9
+      - shinywidgets==0.7.1
+      - uvicorn==0.41.0
+      - querychat
+      - python-dotenv
+      - chatlas
+      - pytest
+      - pytest-playwright
+      - rank_bm25
+      - sentence-transformers
+      - nltk
+      - faiss-cpu
+      

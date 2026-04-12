@@ -1,7 +1,8 @@
 .PHONY: data build search clean all app install
 
 install:
-	pip install -r requirements.txt
+	conda env create -f environment.yml
+	conda activate dsci575_project
 
 data:
 	python src/download_data.py
@@ -11,7 +12,7 @@ build: data
 	python src/build_semantic.py
 
 app:
-	shiny run --reload app/app.py
+	shiny run app/app.py
 
 all: install build app
 
