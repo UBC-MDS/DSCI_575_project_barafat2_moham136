@@ -5,11 +5,15 @@ import pandas as pd
 import nltk
 from nltk.corpus import stopwords
 
-nltk.download("stopwords")
+nltk.download("stopwords", quiet=True)
 stop_words = set(stopwords.words("english"))
 
 DOCS_PATH = "data/processed/documents.parquet"
 BM25_PATH = "models/bm25_model.pkl"
+
+# Global cache
+_df = None
+_bm25 = None
 
 def preprocess_text(text):
     text = str(text).lower()
@@ -19,19 +23,21 @@ def preprocess_text(text):
     return tokens
 
 def load_artifacts():
-    docs = pd.read_parquet(DOCS_PATH)
-
-    with open(BM25_PATH, "rb") as f:
-        bm25 = pickle.load(f)
-
-    return docs, bm25
-
-df, bm25 = load_artifacts()
+    global _df, _bm25
+    
+    if _df is None or _bm25 is None:
+        print("Loading BM25 artifacts...")
+        _df = pd.read_parquet(DOCS_PATH)
+        with open(BM25_PATH, "rb") as f:
+            _bm25 = pickle.load(f)
+    
+    return _df, _bm25
 
 def bm25_search(query, top_k=3):
+    df, bm25 = load_artifacts()
+    
     tokenized_query = preprocess_text(query)
     scores = np.array(bm25.get_scores(tokenized_query))
-
     top_idx = np.argsort(-scores)[:top_k]
 
     results = df.iloc[top_idx].copy()

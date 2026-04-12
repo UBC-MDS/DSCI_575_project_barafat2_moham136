@@ -55,8 +55,9 @@ else:
 
     df = df.reset_index(drop=True)
     df["text"] = df["text"].fillna("").astype(str)
+    df["combined"] = df["title"] + " " + df["text"] + " " + df["product_title"]
 
-    tokens = df["text"].map(preprocess_text)
+    tokens = df["combined"].map(preprocess_text)
 
     tokenized_corpus = tokens.tolist()
 

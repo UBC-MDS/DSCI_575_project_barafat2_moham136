@@ -51,7 +51,6 @@ def load_data(dataset_name, config_name, DATA_PATH, RAW_CACHE_DIR):
 os.makedirs(resolve_path("../data"), exist_ok=True)
 os.makedirs(resolve_path("../data/raw"), exist_ok=True)
 os.makedirs(resolve_path("../data/processed"), exist_ok=True)
-
 # Download and save reviews data    
 RAW_CACHE_DIR = resolve_path("../data/raw")
 REVIEW_PATH = resolve_path("../data/processed/reviews.parquet")
