@@ -1,8 +1,4 @@
-.PHONY: data build search clean all app install
-
-install:
-	conda env create -f environment.yml
-	conda activate dsci575_project
+.PHONY: data build clean all app
 
 data:
 	python src/download_data.py
@@ -14,7 +10,7 @@ build: data
 app:
 	shiny run app/app.py
 
-all: install build app
+all: build app
 
 clean:
 	rm -rf data/processed/* data/merged/* models/*
