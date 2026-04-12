@@ -8,8 +8,8 @@ from nltk.corpus import stopwords
 nltk.download("stopwords")
 stop_words = set(stopwords.words("english"))
 
-DOCS_PATH = "../data/processed/documents.parquet"
-BM25_PATH = "../models/bm25_model.pkl"
+DOCS_PATH = "data/processed/documents.parquet"
+BM25_PATH = "models/bm25_model.pkl"
 
 def preprocess_text(text):
     text = str(text).lower()
@@ -28,7 +28,7 @@ def load_artifacts():
 
 df, bm25 = load_artifacts()
 
-def search(query, top_k=3):
+def bm25_search(query, top_k=3):
     tokenized_query = preprocess_text(query)
     scores = np.array(bm25.get_scores(tokenized_query))
 

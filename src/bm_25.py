@@ -31,17 +31,17 @@ def preprocess_text(text):
 # Create a DuckDB connection
 con = duckdb.connect()
 
-os.makedirs("../data/processed", exist_ok=True)
+os.makedirs("data/processed", exist_ok=True)
 
-data_dir_tokenized = "../data/processed/tokenized_corpus.pkl"
-docs_path = "../data/processed/documents.parquet"
+data_dir_tokenized = "data/processed/tokenized_corpus.pkl"
+docs_path = "data/processed/documents.parquet"
 
 if os.path.exists(data_dir_tokenized) and os.path.exists(docs_path):
     print("Loading tokenized corpus and documents from file...")
     with open(data_dir_tokenized, "rb") as f:
         tokenized_corpus = pickle.load(f)
     
-    docs_path = "../data/processed/documents.parquet"
+    docs_path = "data/processed/documents.parquet"
     df = con.execute(f"SELECT * FROM read_parquet('{docs_path}')").df()
 else:
     df = con.execute("""
@@ -50,7 +50,7 @@ else:
             text,
             rating,
             product_title
-        FROM read_parquet('../data/processed/merged.parquet')
+        FROM read_parquet('data/processed/merged.parquet')
     """).df()
 
     df = df.reset_index(drop=True)
@@ -70,8 +70,8 @@ else:
 
 
 ## BM25 model
-os.makedirs("../models", exist_ok=True)
-bm25_dir = "../models/bm25_model.pkl"
+os.makedirs("models", exist_ok=True)
+bm25_dir = "models/bm25_model.pkl"
 
 if os.path.exists(bm25_dir):
     print("Loading BM25 model from file...")
@@ -81,5 +81,5 @@ else:
     bm25 = BM25Okapi(tokenized_corpus)
     
     
-    with open(os.path.join("../models", "bm25_model.pkl"), "wb") as f:
+    with open(os.path.join("models", "bm25_model.pkl"), "wb") as f:
         pickle.dump(bm25, f)
