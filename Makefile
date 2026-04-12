@@ -4,6 +4,7 @@ data:
 
 build: data
 	python src/bm_25.py
+	python src/semantic_search.py
 
 app:
 	shiny run --reload app/app.py

@@ -47,7 +47,7 @@ def server(input, output, session):
             # Call semantic search function
             return(semantic_search(query, top_k))
         elif method == "hybrid":
-            pass
+            return(bm25_search(query, top_k)) # Placeholder for hybrid search - Will be replaced with actual implementation
 
         return None
     
