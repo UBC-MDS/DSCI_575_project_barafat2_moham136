@@ -66,6 +66,10 @@ def search_hybrid(query, top_k=3, alpha=0.5):
     
     # Sort by hybrid score and return top_k
     merged = merged.sort_values('hybrid_score', ascending=False)
+
+    merged["text"] = merged["text"].apply(
+    lambda x: x[:200] + "..." if isinstance(x, str) and len(x) > 200 else x
+)
     
     # Return with relevant columns
     return merged[['title', 'text', 'hybrid_score', 'rating']].head(top_k).reset_index(drop=True)

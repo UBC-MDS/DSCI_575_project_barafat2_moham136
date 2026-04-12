@@ -1,5 +1,6 @@
 import pickle
 import re
+from unittest import result
 import numpy as np
 import pandas as pd
 import nltk
@@ -42,5 +43,9 @@ def bm25_search(query, top_k=3):
 
     results = df.iloc[top_idx].copy()
     results["score"] = scores[top_idx]
+
+    results["text"] = results["text"].apply(
+    lambda x: x[:200] + "..." if isinstance(x, str) and len(x) > 200 else x
+)
 
     return results[["title", "text", "score", "rating"]].reset_index(drop=True)
