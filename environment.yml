@@ -29,4 +29,5 @@ dependencies:
       - sentence-transformers
       - nltk
       - faiss-cpu
+      - ipywidgets
       
