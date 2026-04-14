@@ -2,7 +2,7 @@ name: dsci-575-project
 channels:
   - conda-forge
 dependencies:
-  - python>=3.12
+  - python==3.11
   - pip
   - numpy
   - ipykernel
@@ -11,6 +11,9 @@ dependencies:
   - ibis-framework
   - duckdb
   - pytorch
+  - langchain
+  - langchain-community
+  - langchain-huggingface
   - pip:
       - openai==2.24.0
       - anthropic
@@ -28,6 +31,5 @@ dependencies:
       - rank_bm25
       - sentence-transformers
       - nltk
-      - faiss-cpu
-      - ipywidgets
+      - faiss-cpu 
       
