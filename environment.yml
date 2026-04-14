@@ -2,7 +2,7 @@ name: dsci-575-project
 channels:
   - conda-forge
 dependencies:
-  - python>=3.12
+  - python==3.12
   - pip
   - numpy
   - ipykernel
