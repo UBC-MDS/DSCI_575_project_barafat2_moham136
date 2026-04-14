@@ -30,4 +30,5 @@ dependencies:
       - nltk
       - faiss-cpu
       - ipywidgets
-      
+      - langchain-huggingface 
+      - huggingface_hub
