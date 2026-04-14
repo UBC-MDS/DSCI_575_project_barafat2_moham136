@@ -29,7 +29,7 @@ def retrieve_context(query: str, top_k: int = 5) -> str:
     Calls your Milestone 1 semantic_search and formats the results
     into a plain text context block for the LLM prompt.
     """
-    results = semantic_search(query, top_k=top_k)
+    results = semantic_search(query, top_k=5)
 
     context_parts = []
     for i, row in results.iterrows():
@@ -106,7 +106,7 @@ def rag_query(question: str, top_k: int = 5) -> str:
 # -------------------------------------------------------------------
 
 if __name__ == "__main__":
-    test_query = "I need a good moisturizer for sensitive skin. What do you recommend?"
+    test_query = "I need a good moisturizer for sensitive skin. What do your top 5 recommends under 4$?"
 
     print("=" * 60)
     print(f"Query: {test_query}")
