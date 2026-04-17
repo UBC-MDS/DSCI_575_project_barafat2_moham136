@@ -102,6 +102,23 @@ In the app, BM25 results are returned with:
 3. Retrieve nearest neighbors from FAISS (L2 distance on embeddings).
 4. Return the top *k* results with a distance-based similarity signal.
 
+
+## RAG Pipeline Workflow
+
+```mermaid
+flowchart TD
+    A([User query]) --> B[Encode query\nMiniLM-L6-v2]
+    B --> C[FAISS semantic search\nIndexFlatIP · cosine similarity]
+    D[(products.parquet)] --> C
+    C --> E[Top-k products retrieved\ntitle · description · score · rating]
+    E --> F[Format context\nretrieve_context]
+    G[System instruction] --> H
+    F --> H[Prompt template\ncontext + question injected]
+    H --> I([LLM · Llama-3-8B\nGrounded recommendation])
+```
+
+
+
 ---
 
 ## Run the app locally

@@ -31,5 +31,7 @@ dependencies:
       - rank_bm25
       - sentence-transformers
       - nltk
-      - faiss-cpu 
-      
+      - faiss-cpu
+      - ipywidgets
+      - langchain-huggingface 
+      - huggingface_hub
