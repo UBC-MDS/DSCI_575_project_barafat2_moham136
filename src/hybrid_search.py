@@ -38,7 +38,7 @@ def search_hybrid(query, top_k=3, alpha=0.5):
     semantic_results = semantic_search(query, top_k=fetch_k)
     semantic_results = semantic_results.copy()
     # For semantic, lower distance is better, so invert it
-    semantic_results['semantic_score'] = 1 / (1 + semantic_results['distance'].values)
+    semantic_results['semantic_score'] = 1 / (1 + semantic_results['score'].values)
     semantic_results['semantic_score'] = normalize_scores(semantic_results['semantic_score'].values)
     
     # Merge results on title (assuming title is unique enough)

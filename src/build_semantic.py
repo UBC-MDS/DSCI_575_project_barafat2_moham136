@@ -7,7 +7,7 @@ import os
 
 # Load data
 DOCUMENTS_PATH = "data/processed/documents.pkl"
-df = pd.read_parquet('data/processed/new_products.parquet')
+ 
 
 if os.path.exists(DOCUMENTS_PATH):
     print("Loading existing documents from disk...")
@@ -15,6 +15,7 @@ if os.path.exists(DOCUMENTS_PATH):
         documents = pickle.load(f)
 else:
     print("Creating documents...")
+    df = pd.read_parquet('data/processed/merged.parquet')
     df['search_text'] = (
         df['product_title'].astype(str).fillna('') + ' ' +
         df['text'].astype(str).fillna('') + ' ' +
@@ -22,6 +23,7 @@ else:
         ).str.strip()
 
     documents = df['search_text'].tolist()
+    df.to_parquet('data/processed/new_products.parquet', index=False)
 
     with open(DOCUMENTS_PATH, "wb") as f:
         pickle.dump(documents, f)
@@ -41,13 +43,26 @@ else:
     np.save(EMBEDDINGS_PATH, embeddings)
     print("Embeddings saved.")
 
-# Build FAISS index 
-faiss.normalize_L2(embeddings)
-dimension = embeddings.shape[1] 
-index = faiss.IndexFlatL2(dimension)   
-index.add(embeddings)
 
-# Save index
+INDEX_PATH = "data/processed/faiss_index/index_products.faiss"
 os.makedirs('data/processed/faiss_index', exist_ok=True)
-faiss.write_index(index, 'data/processed/faiss_index/index_products.faiss')
-print("FAISS index saved.")
+
+if os.path.exists(INDEX_PATH):
+    print("FAISS index already exists. Skipping index creation.")
+else:
+    embeddings = np.array(embeddings, dtype=np.float32)
+    embeddings = np.ascontiguousarray(embeddings)
+
+    chunk_size = 10000
+    for i in range(0, len(embeddings), chunk_size):
+        chunk = embeddings[i:i+chunk_size]
+        faiss.normalize_L2(chunk)
+        embeddings[i:i+chunk_size] = chunk
+    # Build FAISS index 
+    
+    dimension = embeddings.shape[1] 
+    index = faiss.IndexFlatL2(dimension)   
+    index.add(embeddings)
+
+    faiss.write_index(index, INDEX_PATH)
+    print("FAISS index saved.")

@@ -49,13 +49,15 @@ else:
             title,
             text,
             rating,
-            product_title
+            product_title,
+            description
         FROM read_parquet('data/processed/merged.parquet')
     """).df()
 
     df = df.reset_index(drop=True)
     df["text"] = df["text"].fillna("").astype(str)
-    df["combined"] = df["title"] + " " + df["text"] + " " + df["product_title"]
+    df["description"] = df["description"].fillna("").astype(str)
+    df["combined"] = df["title"] + " " + df["text"] + " " + df["product_title"] + " " + df["description"]
 
     tokens = df["combined"].map(preprocess_text)
 
