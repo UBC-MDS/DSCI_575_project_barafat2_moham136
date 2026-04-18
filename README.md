@@ -105,6 +105,17 @@ In the app, BM25 results are returned with:
 
 ## RAG Pipeline Workflow
 
+We implemented a Retrieval-Augmented Generation (RAG) pipeline with two retrieval modes:
+
+- **Semantic RAG**: uses dense embeddings + FAISS to retrieve relevant context.
+- **Hybrid RAG**: combines **BM25 (lexical)** and **semantic** retrieval signals (bm25 + semantic) before constructing the context for generation.
+
+New scripts added:
+- `RAG_pipeline.py`: end-to-end semantic RAG pipeline.
+- `hybrid_search.py`: hybrid retrieval (BM25 + semantic) utility.
+- `hybrid_RAG.py`: end-to-end hybrid RAG pipeline.
+
+
 ```mermaid
 flowchart TD
     A([User query]) --> B[Encode query\nMiniLM-L6-v2]
@@ -153,6 +164,8 @@ This runs:
 - `python src/download_data.py`
 - `python src/build_bm25.py`
 - `python src/build_semantic.py`
+- `python src/RAG_pipeline.py`
+- `python src/hybrid_RAG.py`
 - `shiny run app/app.py`
 
 After the first full build, you can run only the app:
