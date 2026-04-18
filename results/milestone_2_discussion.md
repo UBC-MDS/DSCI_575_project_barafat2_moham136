@@ -112,3 +112,82 @@ Using this prompt, we found that the LLM often ignored the retrieved products an
 
 
 
+
+## Note on Semantic Search Fix (from Milestone 1)
+
+During Milestone 1, semantic search produced consistently irrelevant results across most queries, returning products like lip balm, toe separators, and fake blood for hair care queries. After investigation, the root cause was identified: the document corpus used for embedding only included review title and review text, without any product description. This meant the embedding model had no product-level context to anchor similarity on, causing it to match on superficial or coincidental patterns in review text.
+
+The fix was to add the `description` column to the document construction step, regenerating embeddings and rebuilding the FAISS index with the enriched corpus (product title + review text + product description). This gave the embedding model sufficient product context to return semantically relevant results.
+
+For example, after the fix, Q10 ("highly rated hair product that works for both men and women") returned:
+
+| Product Title | Review | Score | Rating |
+|---|---|---|---|
+| Frederick Benjamin Daily Hydrator Natural Hair Styling Cream | It keeps my hair manageable and applies easily... | 0.684 | 5.0 |
+| Hair Fibers for Men & Women (Dark Brown) | Works great. | 0.695 | 5.0 |
+| Hair Removal For Women and Men - UUPAS Painless Permanent... | This is literally pointless... | 0.701 | 1.0 |
+
+All three results are hair-specific products, a clear improvement over the previous behavior. The Hybrid RAG evaluation below uses this corrected semantic search implementation.
+
+---
+
+## Manual / Qualitative Evaluation — Hybrid RAG Workflow
+
+The Hybrid RAG pipeline combines BM25 and semantic search via Reciprocal Rank Fusion (RRF) for candidate retrieval, then passes the top-k results to an LLM to generate a synthesized answer. Evaluation was performed manually across five queries from Milestone 1.
+
+---
+
+### Evaluation Table
+
+| Query | Type | Accuracy | Completeness | Fluency |
+|---|---|---|---|---|
+| Q1: "argan oil hair spray" | Keyword | Yes | Yes | Yes |
+| Q3: "sulfate free shampoo" | Keyword | Yes | Yes | Yes |
+| Q4: "something to make frizzy hair smooth" | Semantic | Yes | Yes | Yes |
+| Q9: "what do people say about this product causing hair loss" | Complex | No | No | Yes |
+| Q10: "highly rated hair product that works for both men and women" | Complex | Yes | No | Yes |
+
+---
+
+### Per-Query Notes
+
+**Q1 — "argan oil hair spray"**
+BM25 dominated retrieval here with strong exact-match recall. The LLM synthesized a coherent answer citing specific product names and review sentiments. Accuracy and completeness were both strong since the retrieved documents were directly on-topic.
+
+**Q3 — "sulfate free shampoo"**
+Hybrid retrieval performed well, with BM25 ensuring keyword-matched candidates and semantic search now contributing relevant product-level matches thanks to the description field. The generated answer correctly described sulfate-free properties and was easy to read.
+
+**Q4 — "something to make frizzy hair smooth"**
+With the semantic search fix in place, this query now benefits meaningfully from the semantic component. The enriched corpus allowed the embedding model to surface products related to frizz control and smoothing, even without those exact words in the query. The LLM produced a fluent and complete answer that was not possible before the fix.
+
+**Q9 — "what do people say about this product causing hair loss"**
+This remains the weakest result. Neither retrieval method reliably surfaces reviews discussing hair loss as a side effect; most top candidates are positive reviews about healthy hair rather than adverse reactions. The LLM answer is fluent but factually misleading, presenting a positive summary when the query specifically asks about negative experiences. Accuracy is rated No as a result.
+
+**Q10 — "highly rated hair product that works for both men and women"**
+The hybrid approach now retrieves genuinely hair-relevant products for this query, which was not the case before the fix. The generated answer was accurate for what was retrieved but incomplete: the gender-neutral suitability constraint was only partially addressed, and rating-based filtering was not enforced at the retrieval stage.
+
+---
+
+## Key Observations
+
+Overall, the Hybrid RAG workflow performed reliably on keyword and paraphrased queries after the semantic search fix, with the addition of product descriptions to the corpus making a significant difference for retrieval quality. Performance degraded on complex and opinion-aggregation queries (Q9, Q10), where retrieval quality remained the bottleneck: the LLM can only synthesize what it receives, so weak candidates produced misleading or incomplete answers even when generation quality was otherwise high.
+
+---
+
+## Limitations of the Hybrid RAG Workflow
+
+**1. Retrieval cannot enforce structured constraints.**
+Queries that combine semantic intent with structured filters (rating thresholds, gender suitability, price range) cannot be handled by BM25 or semantic retrieval alone. RRF merges ranked lists but has no mechanism to exclude documents that fail a constraint, so the LLM receives candidates that may be irrelevant to part of the query.
+
+**2. Opinion aggregation requires dense, targeted retrieval.**
+For queries like Q9, where the user wants a summary of negative experiences, the pipeline does not distinguish document sentiment or relevance to a specific aspect (side effects vs. general product quality). Retrieving the top-k documents by overall relevance score mixes positive and negative reviews indiscriminately, causing the LLM to produce an answer that does not reflect the full picture.
+
+---
+
+## Suggestions for Improvement
+
+**Metadata pre-filtering:** Before retrieval, filter the corpus by structured fields such as rating range or verified purchase status. This directly addresses constraint-based queries and reduces noise in the candidate set passed to the LLM.
+
+**Aspect-aware or sentiment-filtered retrieval:** For opinion aggregation queries, adding a lightweight sentiment classifier or aspect tagger (e.g., flagging reviews mentioning side effects or complaints) as a pre-retrieval step would help surface the right documents instead of relying on embedding similarity alone.
+
+**Cross-encoder reranking:** Applying a cross-encoder (e.g., `cross-encoder/ms-marco-MiniLM-L-6-v2`) on the top-20 hybrid candidates before passing them to the LLM would improve precision for complex queries, since cross-encoders jointly encode query and document and capture relevance more accurately than the bi-encoder used for semantic retrieval.
