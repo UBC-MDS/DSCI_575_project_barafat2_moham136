@@ -143,25 +143,3 @@ def hybrid_rag_query(question: str, top_k: int = 5) -> str:
     filled_prompt = prompt.invoke({"context": context, "question": question})
     response = llm.invoke(filled_prompt)
     return response.content
-
-
-# QUICK TEST
-
-if __name__ == "__main__":
-    query = "I need a good moisturizer for sensitive skin. What do your top 5 recommends under 20$?"
-
-    print("=" * 60)
-    print(f"Query: {query}")
-    print("=" * 60)
-
-    print("\n--- BM25 results ---")
-    print(bm25_search(query, top_k=3)[["product_title", "score"]].to_string())
-
-    print("\n--- Semantic results ---")
-    print(semantic_search(query, top_k=3)[["product_title", "score"]].to_string())
-
-    print("\n--- Hybrid (RRF) results ---")
-    print(hybrid_search(query, top_k=5)[["product_title", "rrf_score"]].to_string())
-
-    print("\n--- LLM answer ---")
-    print(hybrid_rag_query(query, top_k=5))

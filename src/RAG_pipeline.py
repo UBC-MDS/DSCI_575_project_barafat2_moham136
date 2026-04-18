@@ -99,23 +99,3 @@ def rag_query(question: str, top_k: int = 5) -> str:
     # Call the LLM
     response = llm.invoke(filled_prompt)
     return response.content
-
-
-# -------------------------------------------------------------------
-# 5. QUICK TEST
-# -------------------------------------------------------------------
-
-if __name__ == "__main__":
-    test_query = "I need a good moisturizer for sensitive skin. What do your top 5 recommends under 4$?"
-
-    print("=" * 60)
-    print(f"Query: {test_query}")
-    print("=" * 60)
-
-    print("\n--- Retrieved Context ---")
-    context = retrieve_context(test_query, top_k=3)
-    print(context)
-
-    print("\n--- LLM Answer ---")
-    answer = rag_query(test_query, top_k=3)
-    print(answer)
