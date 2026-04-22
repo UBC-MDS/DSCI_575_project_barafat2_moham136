@@ -1,7 +1,7 @@
 # Final Discussion: Hybrid RAG Product Search Pipeline
 
 This document summarizes the full project across all milestones, covering the
-retrieval pipeline, RAG integration, quantitative evaluation, deployment, and
+retrieval pipeline, RAG integration, quantitative evaluation, and
 overall reflections on what worked and what did not.
 
 Previous milestone discussions are available at:
@@ -21,8 +21,8 @@ Amazon Reviews 2023 dataset (All Beauty category). The pipeline combines:
 - **RAG** (top-k retrieved products passed to `meta-llama/Meta-Llama-3-8B-Instruct` for answer generation)
 - **Shiny app** (interactive UI with a search tab and a RAG chat tab)
 
-The corpus is constructed by joining review text with product metadata (title,
-description), which was a key fix identified in Milestone 1 that significantly
+The corpus is constructed by joining review text with product metadata (text,
+description, product title), which was a key fix identified in Milestone 1 that significantly
 improved semantic search quality.
 
 ---
@@ -128,73 +128,8 @@ future work given the scope of this project.
 
 ---
 
-## 4. Step 3: Deployment
 
-### 4.1 Application
-
-The application is a Python Shiny app (`app/app.py`) with two tabs:
-
-- **Search tab**: the user enters a query and selects a retrieval method (BM25,
-  Semantic, or Hybrid). The top 3 results are displayed in a styled table
-  showing product title, review excerpt, relevance score, and star rating.
-
-- **RAG Chat tab**: the user types a natural language question and receives a
-  synthesized answer grounded in retrieved product reviews. The user can switch
-  between Semantic RAG (Milestone 1 baseline) and Hybrid RAG (Milestone 2
-  pipeline). A typing indicator is shown while the LLM generates its response,
-  and the conversation history is maintained within the session.
-
-### 4.2 Deployment Approach
-
-Deployment was attempted on **HuggingFace Spaces** using Docker as the runtime.
-The Space is configured at:
-`https://huggingface.co/spaces/MhmdJamaal/dsci575-product-search`
-
-The Dockerfile runs the full data pipeline at container startup before launching
-the Shiny app:
-
-```
-download_data.py -> build_bm25.py -> build_semantic.py -> shiny run app/app.py
-```
-
-This approach was chosen over Posit Connect Cloud (free tier) because HuggingFace
-Spaces provides more generous compute resources, native integration with the
-HuggingFace Hub for dataset and model downloads, and a persistent Docker
-environment that better accommodates the build pipeline.
-
-### 4.3 Deployment Challenges and Solutions
-
-**Challenge 1: Dataset authentication**
-The Amazon Reviews 2023 dataset requires `trust_remote_code=True` and a
-HuggingFace token for unauthenticated requests to succeed. This caused the
-first deployment attempt to fail at the `load_dataset` call. The fix was to
-pass `trust_remote_code=True` and `token=os.environ.get("HF_TOKEN")` to
-`load_dataset`, with `HF_TOKEN` stored as a repository secret in the Space
-settings.
-
-**Challenge 2: Embedding generation timeout**
-The full corpus of 700,000+ reviews took an estimated 9 hours to embed on
-HuggingFace's free CPU tier (approximately 12 seconds per batch of 256). This
-exceeded the 30-minute startup timeout and caused the container to be killed
-before the app was ready. The fix was to sample 5,000 rows from the merged
-dataset using DuckDB's `USING SAMPLE 5000 ROWS` clause in `download_data.py`,
-reducing embedding time to under 5 minutes while preserving enough data for
-a functional demonstration.
-
-**Challenge 3: Conda-built dependency in requirements.txt**
-The initial `requirements.txt` was generated in a conda environment, which
-caused pip to record a local `file://` path for `appdirs` instead of a PyPI
-version string. Posit Connect Cloud (an earlier deployment target) rejected
-this with a dependency resolution error. The fix was to filter out `file://`
-references using `pip freeze | grep -v "file://"` and pin `appdirs==1.4.4`
-explicitly.
-
-**Challenge 4: Incompatible GUI packages in container**
-`PySide6` and `shiboken6` are Qt GUI libraries that cannot be installed in a
-headless Linux container. These were removed from `requirements.txt` before
-building the Docker image.
-
-### 4.4 Reproducibility
+### Reproducibility
 
 The full pipeline can be reproduced locally using the Makefile:
 

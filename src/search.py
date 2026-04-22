@@ -24,6 +24,8 @@ _df = None
 _bm25 = None
 
 def preprocess_text(text):
+    """Tokenize and clean text by lowercasing, removing punctuation, and filtering stop words."""
+
     text = str(text).lower()
     text = re.sub(r"[^a-z0-9\s]", " ", text)
     tokens = text.split()
@@ -31,6 +33,8 @@ def preprocess_text(text):
     return tokens
 
 def load_artifacts():
+    """Load and cache the documents DataFrame and BM25 model from disk."""
+
     global _df, _bm25
     
     if _df is None or _bm25 is None:
@@ -42,6 +46,8 @@ def load_artifacts():
     return _df, _bm25
 
 def bm25_search(query, top_k=3):
+    """Return the top-k BM25 results for a query with columns: product_title, text, score, rating."""
+
     df, bm25 = load_artifacts()
     
     tokenized_query = preprocess_text(query)

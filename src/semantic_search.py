@@ -19,6 +19,8 @@ _df    = None
 
 
 def load_semantic_artifacts():
+    """Load and cache the embedding model, FAISS index, and products DataFrame from disk."""
+
     global _model, _index, _df
 
     if _model is None or _index is None or _df is None:
@@ -31,6 +33,8 @@ def load_semantic_artifacts():
 
 
 def semantic_search(query, top_k=5):
+    """Return the top-k semantically similar products for a query with columns: product_title, text, score, rating."""
+
     model, index, df = load_semantic_artifacts()
 
     query_embedding = model.encode([query]).astype('float32')

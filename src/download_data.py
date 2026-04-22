@@ -13,11 +13,13 @@ con = duckdb.connect()
 BASE_DIR = Path(__file__).resolve().parents[1]
 
 def resolve_path(path_str):
-    return BASE_DIR / path_str.replace("../", "")
-
+ """Resolve a path string relative to the project root."""
+ return BASE_DIR / path_str.replace("../", "")
 
 # Define download and save function
 def download_and_save_parquet(dataset_name, config_name, DATA_PATH, RAW_CACHE_DIR):
+    """Download a Hugging Face dataset and save it as a Parquet file.
+    Returns the saved path."""
     print("Downloading dataset from Hugging Face...")
 
     hf_dataset = load_dataset(
@@ -38,6 +40,9 @@ def download_and_save_parquet(dataset_name, config_name, DATA_PATH, RAW_CACHE_DI
 
 # Define load data function
 def load_data(dataset_name, config_name, DATA_PATH, RAW_CACHE_DIR):
+    """Return the path to a local Parquet file,
+      downloading it first if it does not exist."""
+
     if not DATA_PATH.exists():
         print("Parquet file not found. Downloading...")
         download_and_save_parquet(dataset_name, config_name, DATA_PATH, RAW_CACHE_DIR)
