@@ -24,7 +24,10 @@ def download_and_save_parquet(dataset_name, config_name, DATA_PATH, RAW_CACHE_DI
         dataset_name,
         config_name,
         split="full",
-        cache_dir=RAW_CACHE_DIR
+        cache_dir=RAW_CACHE_DIR,
+        trust_remote_code=True,
+        token=os.environ.get("HF_TOKEN")
+
     )
 
     print("Saving to parquet...")
