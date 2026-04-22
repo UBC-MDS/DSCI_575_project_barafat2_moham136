@@ -6,7 +6,7 @@ from pathlib import Path
 
 # Resolve paths relative to THIS file, so they work regardless of
 # which directory the app is launched from.
-BASE_DIR = Path(__file__).resolve().parents[1]  # project root (one level above src/)
+BASE_DIR = Path(__file__).resolve().parent.parent  # project root (one level above src/)
 
 INDEX_PATH   = BASE_DIR / "data" / "processed" / "faiss_index" / "index_products.faiss"
 PARQUET_PATH = BASE_DIR / "data" / "processed" / "new_products.parquet"

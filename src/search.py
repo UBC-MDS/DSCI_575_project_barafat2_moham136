@@ -9,8 +9,15 @@ from nltk.corpus import stopwords
 nltk.download("stopwords", quiet=True)
 stop_words = set(stopwords.words("english"))
 
-DOCS_PATH = "data/processed/documents.parquet"
-BM25_PATH = "models/bm25_model.pkl"
+
+from pathlib import Path
+ROOT = Path(__file__).resolve().parent.parent
+
+DOCS_PATH = str(ROOT / "data" / "processed" / "documents.parquet")
+BM25_PATH = str(ROOT / "models" / "bm25_model.pkl")
+
+# DOCS_PATH = "data/processed/documents.parquet"
+# BM25_PATH = "models/bm25_model.pkl"
 
 # Global cache
 _df = None
