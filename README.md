@@ -1,10 +1,4 @@
 
-
-# DSCI 575 Hybrid Product Search
-
-A hybrid RAG-based product search app using BM25 + semantic search
-
-
 # DSCI_575_project_barafat2_moham136
 
 ## Dataset description
