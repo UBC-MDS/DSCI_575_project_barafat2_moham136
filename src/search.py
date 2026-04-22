@@ -5,12 +5,12 @@ import numpy as np
 import pandas as pd
 import nltk
 from nltk.corpus import stopwords
+from pathlib import Path
 
 nltk.download("stopwords", quiet=True)
 stop_words = set(stopwords.words("english"))
 
 
-from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 
 DOCS_PATH = str(ROOT / "data" / "processed" / "documents.parquet")

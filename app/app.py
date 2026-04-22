@@ -4,31 +4,6 @@
 import subprocess
 from pathlib import Path
 import sys
-ROOT = Path(__file__).resolve().parent.parent
-
-def artifacts_exist():
-    required = [
-        ROOT / "data" / "processed" / "faiss_index" / "index_products.faiss",
-        ROOT / "data" / "processed" / "new_products.parquet",
-        ROOT / "data" / "processed" / "documents.parquet",
-        ROOT / "models" / "bm25_model.pkl",
-    ]
-    return all(p.exists() for p in required)
-
-if not artifacts_exist():
-    print("Artifacts not found. Running setup pipeline...")
-    subprocess.run(
-        [sys.executable, str(ROOT / "src" / "setup.py")],
-        cwd=str(ROOT),
-        check=True
-    )
-    print("Setup complete.")
-
-
-
-
-
-
 from shiny import App, render, ui, reactive
 
 
@@ -685,9 +660,3 @@ def server(input, output, session):
 
 app = App(app_ui, server)
 
-
-
-
-# at the bottom of app.py
-if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=7860)
