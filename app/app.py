@@ -528,31 +528,28 @@ def server(input, output, session):
                 "No results found for your query."
             )
 
-        score_col = next(
-            (c for c in ("hybrid_score", "score", "distance") if any(c in row for row in res)),
+        score_label = next(
+            (row.get("score_label") for row in res if row.get("score_label")),
             None
         )
-        score_header = {"distance": "Distance", "hybrid_score": "Hybrid Score"}.get(score_col, "Score")
+        score_header = {
+            "distance": "Distance",
+            "hybrid_score": "Hybrid Score",
+            "score": "Score",
+        }.get(score_label, "Score")
 
         rows = []
         for row in res:
             score_display = ""
             score_color = "#10b981"
-            if score_col:
-                score_val = row.get(score_col)
-                if score_val is None and score_col == "hybrid_score":
-                    score_val = row.get("score")
-                elif score_val is None and score_col == "distance":
-                    score_val = row.get("score")
-                elif score_val is None and score_col == "score":
-                    score_val = row.get("score")
-
-                if score_val is not None:
-                    score_display = f"{float(score_val):.3f}"
-                    if score_col == "distance":
-                        score_color = "#ef4444" if float(score_val) > 1 else "#10b981"
-                    else:
-                        score_color = "#10b981" if float(score_val) > 0.5 else "#f59e0b"
+            score_val = row.get("score")
+            if score_val is not None:
+                score_float = float(score_val)
+                score_display = f"{score_float:.3f}"
+                if score_label == "distance":
+                    score_color = "#ef4444" if score_float > 1 else "#10b981"
+                else:
+                    score_color = "#10b981" if score_float > 0.5 else "#f59e0b"
 
             rating_val = row.get("rating")
             rating_display = f"⭐ {float(rating_val):.1f}" if rating_val is not None else "N/A"
@@ -610,7 +607,19 @@ def server(input, output, session):
         method = input.rag_method()
         try:
             response = api_rag(question, method, top_k=5)
-            answer = response.get("answer", "")
+            answer = response.get("answer", "") or "⚠️ No answer was returned by the API."
+        except requests.exceptions.ConnectionError:
+            answer = "⚠️ Could not connect to the retrieval API. Make sure the FastAPI server is running and API_BASE_URL is correct."
+        except requests.exceptions.Timeout:
+            answer = "⚠️ The retrieval API took too long to respond."
+        except requests.exceptions.HTTPError as e:
+            detail = ""
+            if e.response is not None:
+                try:
+                    detail = e.response.json().get("detail", "")
+                except Exception:
+                    detail = e.response.text
+            answer = f"⚠️ API request failed. {detail}".strip()
         except Exception as e:
             answer = f"⚠️ Something went wrong: {e}"
 
