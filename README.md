@@ -129,6 +129,20 @@ flowchart TD
     H --> I([LLM · Llama-3-8B\nGrounded recommendation])
 ```
 
+### Additional Feature
+
+We implemented a quantitative evaluation feature to evaluate the performance of our final product (The app) using precision and recall metrics.
+The final document can be located at `../results/final_discussion.md`
+
+
+### Example
+
+Using the RAG Tab;
+
+**QUERY**: 'highly rated hair product that works for both men and women'
+
+**Expected response:** Based on the provided information, the highly rated hair product that works for both men and women is the Curl Defining Cream Activator 
+for Soft Beautiful Curls by Osensia. It is rated 5.0 and is described as suitable for curly hair, which can apply to both men and women.
 
 
 ---
