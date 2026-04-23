@@ -25,6 +25,111 @@ The corpus is constructed by joining review text with product metadata (text,
 description, product title), which was a key fix identified in Milestone 1 that significantly
 improved semantic search quality.
 
+### 1.2 LLM Experiment
+
+We compared the meta-llama/Meta-Llama-3-8B-Instruct, part of the Llama 3 family of LLMs provided by Meta and hosted on Hugging Face an 8B parameter tuned model
+optimized for chat/ Q&A style tasks, to the mistralai/Mistral-7B-Instruct-v0.2 developed by Mistral AI and hosted on hugging face. It is a 7B parameter instruction tuned
+model good for chat/Q&A style tasks.
+
+#### Results and discussions
+
+We evaluated both performances using 5 queries and the same prompt template:
+- queries = [
+    'gentle cleanser for sensitive scalp',
+    'natural scent that is not overpowering',
+    'best leave-in conditioner for thick curly hair under $20',
+    'what do people say about this product causing hair loss',
+    'highly rated hair product that works for both men and women'
+]
+- Prompt used: 
+    PROMPT_TEMPLATE = """
+You are a helpful product recommendation assistant.
+Use ONLY the product information provided below to answer the user's question.
+If the products do not match the query well, say so honestly.
+
+Retrieved Products:
+{context}
+
+User Question: {question}
+
+Your Answer:
+"""
+
+- Results:
+
+Using the meta-llama/Meta-Llama-3-8B-Instruct we obtained the following responses:
+
+=== RAG Query Results using meta-llama/Meta-Llama-3-8B-Instruct ===
+
+Based on the products provided, I don't see any direct match for a gentle cleanser for a sensitive scalp. The products listed include hair accessories, skin care sets, synthetic braids, lip care, and a tanning lotion, but none of them are specifically a gentle cleanser.
+
+However, if you're looking for a gentle skin care product that might also be suitable for a sensitive scalp, the Drunk Elephant Rise + Glow Duo could be a possibility, as it's a gentle skin care set that includes a vitamin C serum and a hydrating gel. 
+==================================================
+
+Based on the provided products, I couldn't find any information related to a product with a "natural scent that is not overpowering". The products listed include a digital timer, plastic pump bottles, hair accessories, and hair care tools, but none of them mention scent or fragrance. If you're looking for a product with a natural scent, I recommend searching for products specifically labeled as "natural fragrances" or "unscented" to find products that match your query. 
+==================================================
+
+Based on the provided products, I couldn't find a suitable match for the best leave-in conditioner for thick curly hair under $20. The products listed don't have information about hair care products, including leave-in conditioners, so I couldn't make a recommendation.
+
+If you're looking for a hair care product, I'd be happy to help you find one if you provide more information or context. 
+==================================================
+
+I don't have any information about the product(s) in the provided list causing hair loss. The reviews focus on the quality, performance, and other aspects of the products but do not mention hair loss. If you have a specific product you're inquiring about, I'd need more information about the product in question. 
+==================================================
+
+Based on the provided information, the highly rated hair product that works for both men and women is the Curl Defining Cream Activator for Soft Beautiful Curls by Osensia. It is rated 5.0 and is described as suitable for curly hair, which can apply to both men and women. 
+==================================================
+
+Using the mistralai/Mistral-7B-Instruct-v0.2 we obtained the following responses:
+
+=== RAG Query Results using mistralai/Mistral-7B-Instruct-v0.2 ===
+
+Based on the information provided, I would recommend the Aveda Lip Saver, despite it being a lip product rather than a cleanser for the scalp. The reason for my recommendation is that the user mentioned in their review that they love Aveda products, and they were disappointed with the overpricing of the Aveda Lip Saver by the seller. However, the user did not mention anything about the product itself being suitable or not for sensitive scalps. Therefore, I cannot make a definitive recommendation based on the product information provided alone. If you have any additional information or context that could help narrow down the options, please let me know and I'll do my best to help you out!
+
+I hope this helps answer your question, and I apologize for the lengthy response. I want to make sure that I provide you with accurate and useful information, rather than just giving you a quick answer that might not be entirely relevant or helpful to your situation.
+
+If you have any further questions or need more clarification on any of the points I've made, please don't hesitate to ask. I'm always here to help answer your questions and provide you with accurate and useful information, no matter how complicated or technical the subject matter might be.
+
+I hope this information is helpful to you in your search for a gentle cleanser for a sensitive scalp. I wish you all the best in your quest for healthy and beautiful 
+==================================================
+
+Based on the product information provided in the retrieved reviews, the following product, "Joband Fashion hairband women hair headband Teeth Comb Hair Hoop Hair band Soft Comfy Non-slip Hair Accessories for Women/Girl," may fit the user's query for a natural scent that is not overpowering.
+
+The user's query does not explicitly mention what type of product they are looking for. Therefore, it is important to consider all the retrieved products and their corresponding reviews to identify the most suitable product for the user's query.
+
+In this case, the user's query mentions the desirable qualities of a natural scent that is not overpowering. Based on the reviews provided for the retrieved products, the "Joband Fashion hairband women hair headband Teeth Comb Hair Hoop Hair band Soft Comfy Non-slip Hair Accessories for Women/Girl" product review mentioned that the hairbands have a subtle and natural scent that is not overpowering. Therefore, this product may be a suitable match for the user's query.
+
+It is important to note that while the product information provided in the retrieved reviews suggest that the "Joband Fashion hairband women hair headband Teeth Comb Hair Hoop Hair band Soft Comfy Non-slip Hair Accessories for Women/Girl" product may be a suitable match for the user's query, it is 
+==================================================
+
+Based on the products provided in the context, none of them matches the query exactly for a leave-in conditioner specifically for thick curly hair under $20.
+
+However, some of the products provided like the "Face and Body Cream Moisturizer - Nourishing Aloe Vera - Manuka Honey for Rosacea Eczema Psoriasis Rashes Itchiness Redness - Natural Organic Cracked Skin Relief - Anti Aging - Anti Wrinkle (64 oz)" could potentially be used as a leave-in conditioner for thick curly hair, but it is not specifically marketed for that purpose and it is above the $20 budget.
+
+Therefore, I would recommend looking for a dedicated leave-in conditioner specifically marketed for thick curly hair within the $20 budget. Some brands that offer such products and are known for their affordability include SheaMoisture, Cantu, and Aussie.
+
+Here are some suggested products that might meet the query's criteria:
+
+1. SheaMoisture Jamaican Black Castor Oil Strengthen & Restore Leave-In Treatment for Damaged Hair, 8 oz
+2. Cantu Shea Butter Leave-In Conditioning Repair Cream, 16 oz
+3. Aussie 3 Minute Miracle Deep Conditioning Treatment, 13.5 
+==================================================
+
+Based on the provided reviews, there is no mention or indication of hair loss caused by any of the products. 
+==================================================
+
+Based on the information provided, I would recommend the Curl Defining Cream Activator by Osensia. This product has a high rating, and it is suitable for both men and women with dry, frizzy, or color-treated hair. 
+==================================================
+
+
+The first thing we notice is that the Mistral model returns very lengthy/verbose response compared to the meta-llama model. The most important thing of note however is the response quality differential for both models.
+The Meta-LLama model provides accurate responses based on the provided query, and also mentions it does not have a good recommendation when it actually does not (it does not hallucinate). The Mistral model
+on the other hand returns results regardless of the quality of a match it makes. This is especially evident when it recommended a lip saver when the query asked for a scalp cleanser.
+
+- Which model you chose and why
+
+Based on the results of our experiment, we will stick to the meta-llama/Meta-Llama-3-8B-Instruct model as it provides a more concise response per query and does not hallucinate or provide unrelated recommendations.
+
 ---
 
 ## 2. Step 1: Hybrid RAG Pipeline (Milestone 2 Continuation)
@@ -47,6 +152,7 @@ cosine distances directly, as each method uses an incompatible scale.
 
 Full qualitative evaluation of the hybrid RAG workflow across five query types
 is documented in `results/milestone_2_discussion.md`.
+
 
 ---
 
