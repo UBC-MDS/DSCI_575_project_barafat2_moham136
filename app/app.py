@@ -1,36 +1,17 @@
 from shiny import App, render, ui, reactive
 from pathlib import Path
-import os
 import sys
-import requests
 
 # Allow imports from src/
 BASE_DIR = Path(__file__).resolve().parents[1]
 SRC_DIR = BASE_DIR / "src"
-API_BASE_URL = os.getenv("API_BASE_URL", "http://127.0.0.1:8000")
-API_TIMEOUT = 120
 sys.path.append(str(SRC_DIR))
 
-
-def api_search(query: str, method: str, top_k: int = 3):
-    response = requests.post(
-        f"{API_BASE_URL}/search",
-        json={"query": query, "method": method, "top_k": top_k},
-        timeout=API_TIMEOUT,
-    )
-    response.raise_for_status()
-    payload = response.json()
-    return payload.get("results", [])
-
-
-def api_rag(question: str, method: str, top_k: int = 5):
-    response = requests.post(
-        f"{API_BASE_URL}/rag",
-        json={"question": question, "method": method, "top_k": top_k},
-        timeout=API_TIMEOUT,
-    )
-    response.raise_for_status()
-    return response.json()
+from search import bm25_search
+from semantic_search import semantic_search
+from hybrid_search import search_hybrid
+from RAG_pipeline import rag_query
+from hybrid_RAG import hybrid_rag_query
 
 SHARED_CSS = """
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
@@ -505,7 +486,13 @@ def server(input, output, session):
         if not query:
             return None
         method = input.method()
-        return api_search(query, method, top_k=3)
+        if method == "bm25":
+            return bm25_search(query, 3)
+        elif method == "semantic":
+            return semantic_search(query, 3)
+        elif method == "hybrid":
+            return search_hybrid(query, 3)
+        return None
 
     @output
     @render.text
@@ -522,39 +509,25 @@ def server(input, output, session):
         res = run_search()
         if res is None:
             return ui.div()
-        if not res:
-            return ui.div(
-                {"class": "status-box"},
-                "No results found for your query."
-            )
 
-        score_label = next(
-            (row.get("score_label") for row in res if row.get("score_label")),
+        score_col = next(
+            (c for c in ("hybrid_score", "score", "distance") if c in res.columns),
             None
         )
-        score_header = {
-            "distance": "Distance",
-            "hybrid_score": "Hybrid Score",
-            "score": "Score",
-        }.get(score_label, "Score")
+        score_header = {"distance": "Distance", "hybrid_score": "Hybrid Score"}.get(score_col, "Score")
 
         rows = []
-        for row in res:
-            score_display = ""
-            score_color = "#10b981"
-            score_val = row.get("score")
-            if score_val is not None:
-                score_float = float(score_val)
-                score_display = f"{score_float:.3f}"
-                if score_label == "distance":
-                    score_color = "#ef4444" if score_float > 1 else "#10b981"
+        for _, row in res.iterrows():
+            if score_col:
+                score_val = row[score_col]
+                score_display = f"{score_val:.3f}"
+                if score_col == "distance":
+                    score_color = "#ef4444" if score_val > 1 else "#10b981"
                 else:
-                    score_color = "#10b981" if score_float > 0.5 else "#f59e0b"
-
-            rating_val = row.get("rating")
-            rating_display = f"⭐ {float(rating_val):.1f}" if rating_val is not None else "N/A"
-            title = str(row.get("product_title", ""))
-            text = str(row.get("text", ""))
+                    score_color = "#10b981" if score_val > 0.5 else "#f59e0b"
+            rating_display = f"⭐ {row['rating']:.1f}" if "rating" in res.columns else "N/A"
+            title = str(row["product_title"])
+            text  = str(row["text"])
             rows.append(
                 ui.tags.tr(
                     ui.tags.td(ui.tags.strong(title[:60] + "..." if len(title) > 60 else title)),
@@ -563,7 +536,7 @@ def server(input, output, session):
                         ui.tags.span(
                             score_display,
                             {"class": "score-badge", "style": f"background:{score_color};color:white;"}
-                        ) if score_display else ""
+                        ) if score_col else ""
                     ),
                     ui.tags.td(ui.tags.span(rating_display, {"class": "rating-badge"})),
                 )
@@ -603,23 +576,13 @@ def server(input, output, session):
         history.append({"role": "assistant", "content": "__typing__"})
         chat_history.set(history)
 
-        # Call the FastAPI backend
+        # Call the appropriate RAG pipeline
         method = input.rag_method()
         try:
-            response = api_rag(question, method, top_k=5)
-            answer = response.get("answer", "") or "⚠️ No answer was returned by the API."
-        except requests.exceptions.ConnectionError:
-            answer = "⚠️ Could not connect to the retrieval API. Make sure the FastAPI server is running and API_BASE_URL is correct."
-        except requests.exceptions.Timeout:
-            answer = "⚠️ The retrieval API took too long to respond."
-        except requests.exceptions.HTTPError as e:
-            detail = ""
-            if e.response is not None:
-                try:
-                    detail = e.response.json().get("detail", "")
-                except Exception:
-                    detail = e.response.text
-            answer = f"⚠️ API request failed. {detail}".strip()
+            if method == "hybrid":
+                answer = hybrid_rag_query(question, top_k=5)
+            else:
+                answer = rag_query(question, top_k=5)
         except Exception as e:
             answer = f"⚠️ Something went wrong: {e}"
 
