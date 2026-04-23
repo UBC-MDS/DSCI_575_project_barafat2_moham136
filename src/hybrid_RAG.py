@@ -90,6 +90,8 @@ def hybrid_search(query: str, top_k: int = 5) -> pd.DataFrame:
 # RAG PIPELINE WITH HYBRID RETRIEVER
 
 def _load_llm():
+    """Instantiate and return the LLaMA-3 chat model via HuggingFace endpoint."""
+
     endpoint = HuggingFaceEndpoint(
         repo_id="meta-llama/Meta-Llama-3-8B-Instruct",
         task="text-generation",
@@ -116,6 +118,8 @@ prompt = ChatPromptTemplate.from_template(PROMPT_TEMPLATE)
 
 
 def _format_context(results: pd.DataFrame) -> str:
+    """Format retrieved product results into a numbered string for the LLM prompt."""
+
     parts = []
     for i, row in results.iterrows():
         part = (

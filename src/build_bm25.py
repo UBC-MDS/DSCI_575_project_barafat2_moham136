@@ -12,6 +12,8 @@ stop_words = set(stopwords.words("english"))
 
 # Preprocessing function
 def preprocess_text(text):
+    """Tokenize and clean text by lowercasing, 
+    removing punctuation, and filtering stop words."""
 
     # Lowercase
     text = str(text).lower()

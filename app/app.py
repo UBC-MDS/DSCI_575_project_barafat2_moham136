@@ -1,6 +1,11 @@
-from shiny import App, render, ui, reactive
+
+
+
+import subprocess
 from pathlib import Path
 import sys
+from shiny import App, render, ui, reactive
+
 
 # Allow imports from src/
 BASE_DIR = Path(__file__).resolve().parents[1]
@@ -654,3 +659,4 @@ def server(input, output, session):
 
 
 app = App(app_ui, server)
+

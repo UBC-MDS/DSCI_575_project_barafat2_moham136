@@ -5,18 +5,27 @@ import numpy as np
 import pandas as pd
 import nltk
 from nltk.corpus import stopwords
+from pathlib import Path
 
 nltk.download("stopwords", quiet=True)
 stop_words = set(stopwords.words("english"))
 
-DOCS_PATH = "data/processed/documents.parquet"
-BM25_PATH = "models/bm25_model.pkl"
+
+ROOT = Path(__file__).resolve().parent.parent
+
+DOCS_PATH = str(ROOT / "data" / "processed" / "documents.parquet")
+BM25_PATH = str(ROOT / "models" / "bm25_model.pkl")
+
+# DOCS_PATH = "data/processed/documents.parquet"
+# BM25_PATH = "models/bm25_model.pkl"
 
 # Global cache
 _df = None
 _bm25 = None
 
 def preprocess_text(text):
+    """Tokenize and clean text by lowercasing, removing punctuation, and filtering stop words."""
+
     text = str(text).lower()
     text = re.sub(r"[^a-z0-9\s]", " ", text)
     tokens = text.split()
@@ -24,6 +33,8 @@ def preprocess_text(text):
     return tokens
 
 def load_artifacts():
+    """Load and cache the documents DataFrame and BM25 model from disk."""
+
     global _df, _bm25
     
     if _df is None or _bm25 is None:
@@ -35,6 +46,8 @@ def load_artifacts():
     return _df, _bm25
 
 def bm25_search(query, top_k=3):
+    """Return the top-k BM25 results for a query with columns: product_title, text, score, rating."""
+
     df, bm25 = load_artifacts()
     
     tokenized_query = preprocess_text(query)

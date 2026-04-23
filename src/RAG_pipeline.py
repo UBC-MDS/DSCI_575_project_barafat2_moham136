@@ -13,6 +13,8 @@ load_dotenv()
 # 1. LLM SETUP
 
 def load_llm():
+    """Instantiate and return the LLaMA-3 chat model via HuggingFace endpoint."""
+
     llm_endpoint = HuggingFaceEndpoint(
         repo_id="meta-llama/Meta-Llama-3-8B-Instruct",
         task="text-generation",
@@ -65,6 +67,8 @@ prompt = ChatPromptTemplate.from_template(PROMPT_TEMPLATE)
 # 4. RAG PIPELINE
 
 def build_rag_pipeline():
+    """Build and return a LangChain RAG chain: retrieve context, fill prompt, call LLM."""
+
     llm = load_llm()
 
     # Chain: retrieve context -> fill prompt -> call LLM

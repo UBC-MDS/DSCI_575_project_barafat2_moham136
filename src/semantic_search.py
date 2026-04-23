@@ -6,7 +6,8 @@ from pathlib import Path
 
 # Resolve paths relative to THIS file, so they work regardless of
 # which directory the app is launched from.
-BASE_DIR = Path(__file__).resolve().parents[1]  # project root (one level above src/)
+# BASE_DIR = Path(__file__).resolve().parents[1]  # project root (one level above src/)
+BASE_DIR = Path(__file__).resolve().parent.parent
 
 INDEX_PATH   = BASE_DIR / "data" / "processed" / "faiss_index" / "index_products.faiss"
 PARQUET_PATH = BASE_DIR / "data" / "processed" / "new_products.parquet"
@@ -18,6 +19,8 @@ _df    = None
 
 
 def load_semantic_artifacts():
+    """Load and cache the embedding model, FAISS index, and products DataFrame from disk."""
+
     global _model, _index, _df
 
     if _model is None or _index is None or _df is None:
@@ -30,6 +33,8 @@ def load_semantic_artifacts():
 
 
 def semantic_search(query, top_k=5):
+    """Return the top-k semantically similar products for a query with columns: product_title, text, score, rating."""
+
     model, index, df = load_semantic_artifacts()
 
     query_embedding = model.encode([query]).astype('float32')
