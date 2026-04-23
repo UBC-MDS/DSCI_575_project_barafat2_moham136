@@ -59,7 +59,7 @@ pydantic==2.12.5
 pydantic_core==2.41.5
 pyee==13.0.1
 python-dotenv==1.2.2
-python-multipart==0.0.24
+python-multipart==0.0.26
 python-slugify==8.0.4
 querychat==0.5.1
 questionary==2.1.1
